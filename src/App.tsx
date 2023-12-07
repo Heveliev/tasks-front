@@ -1,33 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
+import {FormAddTask} from "./components";
+import {TaskList} from "./components/TasksList";
+import {useMutation, useQuery} from "react-query";
+import {addTask, getAllTasks} from "./fetchData";
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { data: todos, refetch } = useQuery('todos', getAllTasks);
+
+  const addTodoMutation = useMutation(addTask);
+  const onSubmit = async ( values:any,{resetForm }:any)=> {
+    await addTodoMutation.mutateAsync(values.newTask);
+    resetForm();
+    refetch();
+
+  };
+
 
   return (
+
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1 className="text-2xl font-bold mb-4">Todo List</h1>
+        <FormAddTask onSubmit={onSubmit}/>
+        <TaskList todos={todos} refetch={refetch}/>
+
     </>
   )
 }
